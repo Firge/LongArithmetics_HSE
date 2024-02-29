@@ -5,35 +5,12 @@
 #include <iostream>
 #include <string>
 #include <tuple>
+#include <ctime>
 
 using namespace bignum::literals;
 
-std::tuple<bignum::BigNum, bignum::BigNum, bignum::BigNum>
-binarySplit(int32_t a, int32_t b)
+std::string readNum(const std::string& filename)
 {
-    bignum::BigNum Pab, Qab, Rab;
-    if (b == a + 1)
-    {
-        Pab = -(6_BN * a - 5) * (2_BN * a - 1) * (6_BN * a - 1);
-        Qab = "10939058860032000"_BN * a * a * a;
-        Rab = Pab * (545140134_BN * a + 13591409);
-    }
-    else
-    {
-        auto m{ (a + b) / 2 };
-        auto [Pam, Qam, Ram]{ binarySplit(a, m) };
-        auto [Pmb, Qmb, Rmb]{ binarySplit(m, b) };
-
-        Pab = Pam * Pmb;
-        Qab = Qam * Qmb;
-        Rab = Qmb * Ram + Pam * Rmb;
-    }
-    return std::make_tuple(Pab, Qab, Rab);
-}
-
-std::string readNumFile(const std::string& filename)
-{
-
     std::ifstream file{ filename };
     std::string res;
     if (file.is_open())
@@ -44,24 +21,42 @@ std::string readNumFile(const std::string& filename)
     return res;
 }
 
+
+bignum::BigNum calculate_pi() {
+    auto C = bignum::BigNum("42698670.66633339581771288916065960827332088400250908280083800717885260515745759421630179991145566860134573716749408041139229273618126672819313688217058256346006679876648346079573598355233398548485458327624737749125075458503257821974567599121240039201532332127683544629648");
+    auto S = bignum::BigNum("0");
+    auto Mq = bignum::BigNum("1");
+    auto Lq = bignum::BigNum("13591409");
+    auto Xq = bignum::BigNum("1");
+
+    for (size_t q = 0; q < 100 / 14 + 1; ++q) {
+        S = S + Mq * Lq / Xq;
+        Mq = Mq * bignum::BigNum(8 * (6 * q + 1) * (6 * q + 3) * (6 * q + 5));
+        Mq = Mq / bignum::BigNum((q + 1) * (q + 1) * (q + 1));
+        Lq = Lq + bignum::BigNum("545140134");
+        Xq = Xq * bignum::BigNum("-262537412640768000");
+    }
+
+    return C / S;
+}
+
 int main()
 {
-    bignum::BigNum::setMinimalPrecision(100);
+    long precision;
+    std::cout << "Enter precision of calculation" << std::endl;
+    std::cin >> precision;
+    bignum::BigNum::setMinimalPrecision(precision);
 
-    bignum::BigNum koeff{ readNumFile("coeff_string") };
-    auto start{ std::chrono::high_resolution_clock::now() };
-    auto [P1n, Q1n, R1n]{ binarySplit(
-        1,
-        std::max(80ll, bignum::BigNum::getMinimalPrecision() / 10ll)) };
-    auto pi{ (koeff * Q1n) / (13591409 * Q1n + R1n) };
-    auto stop{ std::chrono::high_resolution_clock::now() };
-    auto duration{ std::chrono::duration_cast<std::chrono::milliseconds>(
-        stop - start) };
+    bignum::BigNum сoeff{ readNum("coeff_string") };
+
+    long start_time = clock();
+    auto pi {calculate_pi()};
+    long finish_time = clock();
+    double duration = static_cast<double>(finish_time - start_time) / CLOCKS_PER_SEC;
     std::cout << "Calculated pi: \n" << pi << std::endl;
-    std::cout << "It takes " << duration.count() << " ms"
-              << std::endl;
-    auto piStr{ (std::string)pi };
-    std::string actualPiStr{ readNumFile("pi_string") };
+    std::cout << "It takes " << duration << " s" << std::endl;
+    std::string piStr{ (std::string)pi };
+    std::string actualPiStr{ readNum("pi_string") };
     int32_t matchCount{ 0 };
     for (int32_t i{ 2 }; i < piStr.length(); ++i)
     {

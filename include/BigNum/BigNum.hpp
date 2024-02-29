@@ -31,17 +31,13 @@ public:
 
     BigNum(const std::string&);
 
-    // Set pricision in digits
     static void setMinimalPrecision(uint64_t);
-    // Retrieve precision in degits
     static int64_t getMinimalPrecision();
 
     // BigNum power
     static BigNum pow(const BigNum&, const BigNum&);
 
 public:
-    // BigNum& operator=(const BigNum&) = default;
-    // BigNum& operator=(BigNum&&) = default;
     BigNum operator-() const;
 
     friend BigNum& operator-=(BigNum&, const BigNum&);
@@ -54,9 +50,7 @@ public:
     friend bool operator==(const BigNum &, const BigNum &);
     operator std::string() const;
 
-    // Find inverse of the number
     BigNum inverse() const;
-	// Get factorial of big number
     BigNum factorial() const;
 
 private:
@@ -108,6 +102,6 @@ inline BigNum operator"" _BN(const char* str, size_t len)
     return BigNum{ str };
 }
 inline BigNum operator""_BN(long double num) { return BigNum{ num }; }
-} // namespace literals
+}
 
-} // namespace bignum
+}
