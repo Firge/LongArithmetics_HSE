@@ -1,4 +1,3 @@
-#pragma once
 #include <cstdint>
 #include <ostream>
 #include <string>
@@ -11,7 +10,7 @@ namespace bignum
 class ZeroDivisionException : public std::exception
 {
 public:
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 };
 
 class BigNum
@@ -34,7 +33,6 @@ public:
     static void setMinimalPrecision(uint64_t);
     static int64_t getMinimalPrecision();
 
-    // BigNum power
     static BigNum pow(const BigNum&, const BigNum&);
 
 public:
@@ -48,10 +46,11 @@ public:
 
     friend std::strong_ordering operator<=>(const BigNum &, const BigNum &);
     friend bool operator==(const BigNum &, const BigNum &);
-    operator std::string() const;
 
-    BigNum inverse() const;
-    BigNum factorial() const;
+    explicit operator std::string() const;
+
+    [[nodiscard]] BigNum inverse() const;
+    [[nodiscard]] BigNum factorial() const;
 
 private:
     template <typename Iterator>
@@ -91,17 +90,12 @@ BigNum& operator-=(BigNum&, const BigNum&);
 bool operator==(const BigNum &, const BigNum &);
 bool operator!=(const BigNum &, const BigNum &);
 
+
 namespace literals
 {
-inline BigNum operator""_BN(unsigned long long num)
-{
-    return BigNum{ num };
-}
-inline BigNum operator"" _BN(const char* str, size_t len)
-{
-    return BigNum{ str };
-}
+inline BigNum operator""_BN(unsigned long long num) { return BigNum{ num }; }
 inline BigNum operator""_BN(long double num) { return BigNum{ num }; }
+inline BigNum operator"" _BN(const char* str, size_t len) { return BigNum{ str }; }
 }
 
 }

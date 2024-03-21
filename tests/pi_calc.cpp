@@ -1,26 +1,10 @@
 #include <BigNum/BigNum.hpp>
 
-#include <chrono>
-#include <fstream>
 #include <iostream>
 #include <string>
-#include <tuple>
 #include <ctime>
 
 using namespace bignum::literals;
-
-std::string readNum(const std::string& filename)
-{
-    std::ifstream file{ filename };
-    std::string res;
-    if (file.is_open())
-    {
-        file >> res;
-        file.close();
-    }
-    return res;
-}
-
 
 bignum::BigNum calculate_pi() {
     auto C = bignum::BigNum("42698670.66633339581771288916065960827332088400250908280083800717885260515745759421630179991145566860134573716749408041139229273618126672819313688217058256346006679876648346079573598355233398548485458327624737749125075458503257821974567599121240039201532332127683544629648");
@@ -47,28 +31,13 @@ int main()
     std::cin >> precision;
     bignum::BigNum::setMinimalPrecision(precision);
 
-    bignum::BigNum сoeff{ readNum("coeff_string") };
-
     long start_time = clock();
     auto pi {calculate_pi()};
     long finish_time = clock();
+
     double duration = static_cast<double>(finish_time - start_time) / CLOCKS_PER_SEC;
     std::cout << "Calculated pi: \n" << pi << std::endl;
     std::cout << "It takes " << duration << " s" << std::endl;
     std::string piStr{ (std::string)pi };
-    std::string actualPiStr{ readNum("pi_string") };
-    int32_t matchCount{ 0 };
-    for (int32_t i{ 2 }; i < piStr.length(); ++i)
-    {
-        if (piStr[i] == actualPiStr[i])
-        {
-            matchCount++;
-        }
-        else
-        {
-            break;
-        }
-    }
-    std::cout << "Matched " << matchCount << " digits" << std::endl;
     return 0;
 }

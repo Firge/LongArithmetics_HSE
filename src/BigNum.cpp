@@ -6,7 +6,6 @@
 namespace bignum
 {
 
-
 uint64_t BigNum::s_Precision{ 100 };
 
 void BigNum::setMinimalPrecision(uint64_t value) { s_Precision = value; }
@@ -22,18 +21,18 @@ BigNum BigNum::pow(const BigNum& base, const BigNum& power)
     return result;
 }
 
-BigNum::BigNum(const std::string& numStr)
+BigNum::BigNum(const std::string& nums)
 {
-    std::string digits{ numStr };
+    std::string digits{ nums };
 
-    if (numStr[0] == '-') {
+    if (nums[0] == '-') {
         this->m_Negative = true;
-        digits = numStr.substr(1);
+        digits = nums.substr(1);
     }
 
-    m_Exponent = numStr.size() - this->m_Negative;
+    m_Exponent = nums.size() - this->m_Negative;
 
-    for (int32_t i{ 0 }; i < digits.size(); i++) {
+    for (int32_t i{ 0 }; i < digits.size(); ++i) {
         if (digits[i] != '.') this->m_Digits.push_back(digits[i] - '0');
         else this->m_Exponent = i;
     }
@@ -41,19 +40,21 @@ BigNum::BigNum(const std::string& numStr)
     this->_removeInsignificantZeroes();
 }
 
+
+
 void BigNum::_normalize()
 {
-    DigitType carry;
+    DigitType trans;
     for (int32_t i{ static_cast<int32_t>(m_Digits.size() - 1) }; i > 0; --i) {
         if (m_Digits[i] >= BigNum::s_Base) {
-            carry = m_Digits[i] / BigNum::s_Base;
-            m_Digits[i - 1] += carry;
-            m_Digits[i] -= carry * BigNum::s_Base;
+            trans = m_Digits[i] / BigNum::s_Base;
+            m_Digits[i - 1] += trans;
+            m_Digits[i] -= trans * BigNum::s_Base;
         }
         else if (m_Digits[i] < 0) {
-            carry = (m_Digits[i] + 1) / BigNum::s_Base - 1;
-            m_Digits[i - 1] += carry;
-            m_Digits[i] -= carry * BigNum::s_Base;
+            trans = (m_Digits[i] + 1) / BigNum::s_Base - 1;
+            m_Digits[i - 1] += trans;
+            m_Digits[i] -= trans * BigNum::s_Base;
         }
     }
 }

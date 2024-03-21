@@ -7,17 +7,14 @@ TEST(Operations, Division)
 {
     bignum::BigNum::setMinimalPrecision(100);
     EXPECT_EQ(
-        bignum::BigNum{
-            "5" } /
-            bignum::BigNum{ "2" },
-        bignum::BigNum{
-            "2.5" });
+        bignum::BigNum{ "5" } / bignum::BigNum{ "2" },
+        bignum::BigNum{ "2.5" });
 }
 
 TEST(Operations, DivisionZero)
 {
     bignum::BigNum::setMinimalPrecision(100);
-    EXPECT_THROW("1"_BN / "0"_BN, bignum::ZeroDivisionException);
+    EXPECT_THROW("2"_BN / "0"_BN, bignum::ZeroDivisionException);
 }
 
 TEST(Operations, Division_Whole)
@@ -30,8 +27,8 @@ TEST(Operations, Division_Whole)
 TEST(Operations, Multiplication_integer)
 {
     EXPECT_EQ(
-        bignum::BigNum{"15"} * bignum::BigNum{"3"},
-        bignum::BigNum{"45"});
+        bignum::BigNum{"12"} * bignum::BigNum{"5"},
+        bignum::BigNum{"60"});
 }
 
 TEST(Operations, Multiplication_decimal)
@@ -39,142 +36,103 @@ TEST(Operations, Multiplication_decimal)
     bignum::BigNum::setMinimalPrecision(100);
     EXPECT_EQ(
         bignum::BigNum{
-            "0.101112131415161718192012345678910111213141516171819201234567891011121314151617181920" } *
-            bignum::BigNum{ "0.201918171615141312111098720191817161514131"
-                            "211109872019181716151413121110987" },
+            "0.532892359238723458247834783587357845782478249824893578947845782478239823953013412387" } *
+            bignum::BigNum{ "0.013847573271544723872848562129120101029293845474732892398349355353398891823824823" },
         bignum::BigNum{
-            "0."
-            "020416376703459344995620984065805322697519844202274376108734"
-            "686517219578761881212093693084449510006055072545716956859606"
-            "360429537726369278920725477508489755040" });
+            "0.007379265990404556058329326132289801815521995154283447034859252825741903236071734233191206166718958663754110494034393713380302836648339733173060750333897593346282501" });
 }
 
 TEST(Operations, Sum_Positive)
 {
     bignum::BigNum::setMinimalPrecision(100);
     EXPECT_EQ(
-        bignum::BigNum{
-            "0.10111213141516171819201234567"
-            "8910111213141516171819201234567891011121314151617181920" } +
-            bignum::BigNum{ "0.201918171615141312111098720191817161514131"
-                            "211109872019181716151413121110987" },
-        bignum::BigNum{ "0."
-                        "303030303030303030303111065870727272727272727281"
-                        "691220416284042424242425138617181920" });
+        bignum::BigNum{"0.532892359238723458247834783587357845782478249824893578947845782478239823953013412387" } +
+            bignum::BigNum{ "0.013847573271544723872848562129120101029293845474732892398349355353398891823824823" },
+        bignum::BigNum{ "0.546739932510268182120683345716477946811772095299626471346195137831638715776838235387" });
 }
 
-TEST(Operations, Sum_Negative)
-{
-    EXPECT_EQ("-21.5"_BN + -"24.5"_BN, "-46"_BN);
-}
+TEST(Operations, Sum_Negative) { EXPECT_EQ("-11.6"_BN + -"23.5"_BN, "-35.1"_BN); }
 
-TEST(Operations, Sum_PositiveNegative)
-{
-    EXPECT_EQ("21.5"_BN + "-24.5"_BN, "-3"_BN);
-}
+TEST(Operations, Sum_PositiveNegative) { EXPECT_EQ("11.6"_BN + "-23.5"_BN, "-11.9"_BN); }
 
-TEST(Operations, Sum_DigitAdd)
-{
-    EXPECT_EQ("0.99999999"_BN + "0.00000001"_BN, 1_BN);
-}
+TEST(Operations, Sum_DigitAdd) { EXPECT_EQ("0.999999999"_BN + "0.000000001"_BN, 1_BN); }
 
 TEST(Operations, Difference_Positive)
 {
     bignum::BigNum::setMinimalPrecision(100);
     EXPECT_EQ(
-        bignum::BigNum{
-            "0.10111213141516171819201234567"
-            "8910111213141516171819201234567891011121314151617181920" } -
-            bignum::BigNum{ "0.201918171615141312111098720191817161514131"
-                            "211109872019181716151413121110987" },
-        bignum::BigNum{ "-0."
-                        "100806040199979593919086374512907050300989694938"
-                        "05281794714826040199979683538281808" });
+        bignum::BigNum{"0.532892359238723458247834783587357845782478249824893578947845782478239823953013412387" } -
+            bignum::BigNum{"0.013847573271544723872848562129120101029293845474732892398349355353398891823824823" },
+        bignum::BigNum{ "0.519044785967178734374986221458237744753184404350160686549496427124840932129188589387" });
 }
 
-TEST(Operations, Difference_PositiveNegative)
-{
-    EXPECT_EQ("20.001"_BN - "-1.1"_BN, "21.101"_BN);
-}
+TEST(Operations, Difference_PositiveNegative) { EXPECT_EQ("950.0001"_BN - "-14.7"_BN, "964.7001"_BN); }
 
 TEST(Operations, Pow)
 {
-    EXPECT_EQ(bignum::BigNum::pow("2.5"_BN, 4_BN), "39.0625"_BN);
+    bignum::BigNum::setMinimalPrecision(100);
+    EXPECT_EQ(bignum::BigNum::pow("3.49"_BN, 4_BN), "148.35483601"_BN);
 }
 
-TEST(Operations, Factorial)
-{
-    EXPECT_EQ("12"_BN.factorial(), "479001600"_BN);
-}
+TEST(Operations, Factorial) { EXPECT_EQ("11"_BN.factorial(), "39916800"_BN); }
 
-TEST(Comparison, LT) { EXPECT_LT(2934992.000344_BN, 100000000000_BN); }
+// comparators
+TEST(Comparison, LT) { EXPECT_LT(645786709.0678_BN, 9999999999_BN); }
 
-TEST(Comparison, LE_Equal) { EXPECT_LE(1_BN, 1_BN); }
+TEST(Comparison, LE_Equal) { EXPECT_LE(1485.5_BN, 1485.5_BN); }
 
 TEST(Comparison, LE_Less) { EXPECT_LE(1_BN, "1.000000000001"_BN); }
 
-TEST(Comparison, GT) { EXPECT_GT(100_BN, "0.00000000001"_BN); }
+TEST(Comparison, GT) { EXPECT_GT(100_BN, "0.000098000001"_BN); }
 
-TEST(Comparison, EQ)
-{
-    EXPECT_EQ(bignum::BigNum{ "123.00000123" }, "123.00000123"_BN);
-}
+TEST(Comparison, EQ){EXPECT_EQ(bignum::BigNum{ "459.90000123" }, "459.90000123"_BN);}
 
-TEST(Comparison, EQ_Substract)
-{
-    EXPECT_EQ("1.001"_BN - "0"_BN, "1.001"_BN);
-}
-
-TEST(Comparison, EQ_Zero) { EXPECT_EQ(bignum::BigNum{ "-0" }, "0"_BN); }
+TEST(Comparison, EQ_Substract) { EXPECT_EQ("6.061"_BN - "0"_BN, "6.061"_BN); }
 
 TEST(Comparison, NE) { EXPECT_NE(bignum::BigNum{ "-1.1" }, "1.1"_BN); }
 
-TEST(General, ToString)
-{
-    EXPECT_EQ((std::string)bignum::BigNum{ -123 }, "-123");
-}
+TEST(Comparison, EQ_Zero) { EXPECT_EQ(bignum::BigNum{ "-0" }, "0"_BN); }
 
-TEST(General, ToString_Zero)
-{
-    EXPECT_EQ((std::string)bignum::BigNum{ -0 }, "0");
-}
+// conv
+TEST(General, ToString) { EXPECT_EQ((std::string)bignum::BigNum{ -345 }, "-345"); }
 
-TEST(General, ToString_SmallExp)
-{
-    EXPECT_EQ((std::string)bignum::BigNum{ "0.000001" }, "0.000001");
-}
+TEST(General, ToString_SmallExp) { EXPECT_EQ((std::string)bignum::BigNum{ "0.048701" }, "0.048701"); }
 
-TEST(General, Cout)
-{
-    EXPECT_NO_THROW(std::cout << bignum::BigNum{ -123 });
-}
+TEST(General, ToString_Zero) { EXPECT_EQ((std::string)bignum::BigNum{ -0 }, "0"); }
+
+// services
 
 TEST(General, GetPrecision)
 {
-    bignum::BigNum::setMinimalPrecision(125);
-    EXPECT_EQ(bignum::BigNum::getMinimalPrecision(), 125);
+    bignum::BigNum::setMinimalPrecision(100);
+    EXPECT_EQ(bignum::BigNum::getMinimalPrecision(), 100);
 }
+
+TEST(General, Cout) { EXPECT_NO_THROW(std::cout << bignum::BigNum{ -987456321 }); }
 
 TEST(General, DemoCase)
 {
-    bignum::BigNum numFromString{ "-234.567" };
-    bignum::BigNum numFromBaseType1{ 12345 };
-    bignum::BigNum numFromBaseType2{ 12345.333 };
-    1_BN - 0.43_BN;
-    "6514.22"_BN;
+    bignum::BigNum bignumFromString{ "-234.567" };
+    bignum::BigNum numFromBaseType1{ 13948 };
+    bignum::BigNum numFromBaseType2{ 13948.333 };
+    12_BN - 3.85_BN;
+    "94815.7902"_BN;
 
-    1 / numFromString;
-    numFromString.inverse();
+    1 / bignumFromString;
+    bignumFromString.inverse();
 
-    bignum::BigNum::setMinimalPrecision(1000);
-    auto a{ -322.322_BN };
-    bignum::BigNum b{ 121.21 };
-    (a + b);
-    (a - b);
+    bignum::BigNum::setMinimalPrecision(100);
+    auto a{ -1234.123_BN };
+    bignum::BigNum b{ 1234.01 };
+
     (a * b);
     (a / b);
+    (a + b);
+    (a - b);
 
+    (a > b);
     (a < b);
+    (a <= b);
     (a >= b);
     (a == b);
     (a <=> b);
