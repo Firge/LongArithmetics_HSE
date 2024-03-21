@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(BigNum CXX)  
+project(BigNum)  
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,8 +26,6 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE 
 	PROJECT_NAME=${PROJECT_NAME}
 )
-
-configure_file(tests/pi_string pi_string COPYONLY)
 
 add_executable(${PROJECT_NAME}_pi tests/pi_calc.cpp)
 target_link_libraries(${PROJECT_NAME}_pi PRIVATE ${PROJECT_NAME})
