@@ -36,6 +36,8 @@ BigNum::BigNum(const std::string& nums)
         if (digits[i] != '.') this->m_Digits.push_back(digits[i] - '0');
         else this->m_Exponent = i;
     }
+
+    this->_removeInsignificantZeroes();
 }
 
 
@@ -55,7 +57,10 @@ void BigNum::_normalize()
             m_Digits[i] -= trans * BigNum::s_Base;
         }
     }
-    // remove zeroes
+}
+
+void BigNum::_removeInsignificantZeroes()
+{
     while (this->m_Digits.size() > (m_Exponent > 1L? m_Exponent: 1L) &&
            !this->m_Digits.back())
     {
@@ -68,21 +73,6 @@ void BigNum::_normalize()
         this->m_Exponent--;
     }
 }
-
-//void BigNum::_removeInsignificantZeroes()
-//{
-//    while (this->m_Digits.size() > (m_Exponent > 1L? m_Exponent: 1L) &&
-//           !this->m_Digits.back())
-//    {
-//        this->m_Digits.pop_back();
-//    }
-//
-//    while (!this->m_Digits.empty() && !this->m_Digits.front())
-//    {
-//        this->m_Digits.erase(this->m_Digits.begin());
-//        this->m_Exponent--;
-//    }
-//}
 
 BigNum BigNum::factorial() const
 {
@@ -126,7 +116,7 @@ BigNum BigNum::inverse() const
         }
 
         dividend.m_Exponent++;
-        dividend._normalize();
+        dividend._removeInsignificantZeroes();
         result.m_Digits.push_back(digit);
         currentDigitsEvald++;
     } while (dividend != 0_BN && currentDigitsEvald < totalDigits);
@@ -180,6 +170,7 @@ BigNum operator+(const BigNum& a, const BigNum& b) {
     }
     result.m_Exponent = std::max(a.m_Exponent, b.m_Exponent) + 1;
     result._normalize();
+    result._removeInsignificantZeroes();
     return result;
 }
 
@@ -202,6 +193,7 @@ BigNum operator-(const BigNum& a, const BigNum& b) {
     }
     result.m_Exponent = std::max(a.m_Exponent, b.m_Exponent) + 1;
     result._normalize();
+    result._removeInsignificantZeroes();
     return result;
 }
 
@@ -217,6 +209,7 @@ BigNum operator*(const BigNum& a, const BigNum& b) {
     result.m_Exponent = a.m_Exponent + b.m_Exponent;
     result.m_Negative = a.m_Negative != b.m_Negative;
     result._normalize();
+    result._removeInsignificantZeroes();
     return result;
 }
 

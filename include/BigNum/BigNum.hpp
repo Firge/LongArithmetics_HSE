@@ -65,6 +65,7 @@ private:
     static void _commonExponent(BigNum&, BigNum&);
     static void _commonLength(BigNum&, BigNum&);
 
+    void _removeInsignificantZeroes();
     void _normalize();
 
     constexpr const DigitType& operator[](int32_t i) const;
