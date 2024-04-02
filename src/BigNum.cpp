@@ -10,14 +10,14 @@ uint64_t BigNum::s_Precision{ 100 };
 
 void BigNum::setMinimalPrecision(uint64_t value) { s_Precision = value; }
 
-int64_t BigNum::getMinimalPrecision() { return BigNum::s_Precision; }
+uint64_t BigNum::getMinimalPrecision() { return BigNum::s_Precision; }
 
 BigNum::BigNum() : m_Digits(1, 0) {}
 
 BigNum BigNum::pow(const BigNum& base, const BigNum& power)
 {
-    BigNum result{ 1 };
-    for (BigNum i{ 0 }; i < power; i = i + 1) result = result * base;
+    BigNum result = 1_BN;
+    for (BigNum i = 0_BN; i < power; i = i + 1_BN) result = result * base;
     return result;
 }
 
@@ -30,14 +30,12 @@ BigNum::BigNum(const std::string& nums)
         digits = nums.substr(1);
     }
 
-    m_Exponent = nums.size() - this->m_Negative;
+    m_Exponent = static_cast<int32_t >(nums.size()) - static_cast<int32_t >(this->m_Negative);
 
     for (int32_t i{ 0 }; i < digits.size(); ++i) {
         if (digits[i] != '.') this->m_Digits.push_back(digits[i] - '0');
         else this->m_Exponent = i;
     }
-
-    this->_removeInsignificantZeroes();
 }
 
 
@@ -45,7 +43,7 @@ BigNum::BigNum(const std::string& nums)
 void BigNum::_normalize()
 {
     DigitType trans;
-    for (int32_t i{ static_cast<int32_t>(m_Digits.size() - 1) }; i > 0; --i) {
+    for (int32_t i{ static_cast<int32_t>(m_Digits.size()) - 1 }; i > 0; --i) {
         if (m_Digits[i] >= BigNum::s_Base) {
             trans = m_Digits[i] / BigNum::s_Base;
             m_Digits[i - 1] += trans;
@@ -57,27 +55,39 @@ void BigNum::_normalize()
             m_Digits[i] -= trans * BigNum::s_Base;
         }
     }
-}
-
-void BigNum::_removeInsignificantZeroes()
-{
+    // remove zeroes
     while (this->m_Digits.size() > (m_Exponent > 1L? m_Exponent: 1L) &&
            !this->m_Digits.back())
     {
         this->m_Digits.pop_back();
     }
 
-    while (this->m_Digits.size() && !this->m_Digits.front())
+    while (!this->m_Digits.empty() && !this->m_Digits.front())
     {
         this->m_Digits.erase(this->m_Digits.begin());
         this->m_Exponent--;
     }
 }
 
+//void BigNum::_removeInsignificantZeroes()
+//{
+//    while (this->m_Digits.size() > (m_Exponent > 1L? m_Exponent: 1L) &&
+//           !this->m_Digits.back())
+//    {
+//        this->m_Digits.pop_back();
+//    }
+//
+//    while (!this->m_Digits.empty() && !this->m_Digits.front())
+//    {
+//        this->m_Digits.erase(this->m_Digits.begin());
+//        this->m_Exponent--;
+//    }
+//}
+
 BigNum BigNum::factorial() const
 {
-    BigNum result{ 1 };
-    for (BigNum i{ 2 }; i <= *this; i = i + 1){
+    BigNum result = 1_BN ;
+    for (BigNum i = 2_BN; i <= *this; i = i + 1_BN){
         result = result * i;
     }
     return result;
@@ -85,7 +95,7 @@ BigNum BigNum::factorial() const
 
 BigNum BigNum::inverse() const
 {
-    if (*this == 0) throw bignum::ZeroDivisionException{};
+    if (*this == 0_BN) throw ZeroDivisionException{};
 
     BigNum copy{ *this };
     copy.m_Negative = false;
@@ -93,9 +103,9 @@ BigNum BigNum::inverse() const
     result.m_Exponent = 1;
     result.m_Negative = this->m_Negative;
     result.m_Digits = {};
-    BigNum dividend{ 1 };
+    BigNum dividend = 1_BN;
 
-    while (copy < 1) {
+    while (copy < 1_BN) {
         copy.m_Exponent++;
         result.m_Exponent++;
     }
@@ -116,10 +126,10 @@ BigNum BigNum::inverse() const
         }
 
         dividend.m_Exponent++;
-        dividend._removeInsignificantZeroes();
+        dividend._normalize();
         result.m_Digits.push_back(digit);
         currentDigitsEvald++;
-    } while (dividend != 0 && currentDigitsEvald < totalDigits);
+    } while (dividend != 0_BN && currentDigitsEvald < totalDigits);
 
     return result;
 }
@@ -152,9 +162,9 @@ BigNum& operator-=(BigNum& a, const BigNum& b) { return (a = a - b); }
 BigNum operator+(const BigNum& a, const BigNum& b) {
     if (a.m_Negative) {
         if (b.m_Negative) return -(-a + (-b));
-        else return b - (-a);
+        return b - (-a);
     }
-    else if (b.m_Negative) return a - (-b);
+    if (b.m_Negative) return a - (-b);
 
     BigNum num1{ a };
     BigNum num2{ b };
@@ -170,7 +180,6 @@ BigNum operator+(const BigNum& a, const BigNum& b) {
     }
     result.m_Exponent = std::max(a.m_Exponent, b.m_Exponent) + 1;
     result._normalize();
-    result._removeInsignificantZeroes();
     return result;
 }
 
@@ -193,7 +202,6 @@ BigNum operator-(const BigNum& a, const BigNum& b) {
     }
     result.m_Exponent = std::max(a.m_Exponent, b.m_Exponent) + 1;
     result._normalize();
-    result._removeInsignificantZeroes();
     return result;
 }
 
@@ -209,7 +217,6 @@ BigNum operator*(const BigNum& a, const BigNum& b) {
     result.m_Exponent = a.m_Exponent + b.m_Exponent;
     result.m_Negative = a.m_Negative != b.m_Negative;
     result._normalize();
-    result._removeInsignificantZeroes();
     return result;
 }
 
@@ -233,33 +240,36 @@ BigNum::operator std::string() const {
         exp = 0;
     }
 
-    for (; i < std::min(static_cast<int64_t>(this->m_Digits.size()), this->m_Exponent); ++i) {
-        result += '0' + this->m_Digits[i];
+    for (i = 0; i < std::min(static_cast<int64_t>(this->m_Digits.size()), this->m_Exponent); ++i) {
+        result += std::to_string(this->m_Digits[i]);
         exp--;
     }
 
-    while (i < exp) result += "0";
+    while (i < exp) {
+        result += "0";
+        --exp;
+    }
 
     if (this->m_Exponent < this->m_Digits.size() && this->m_Exponent > 0) result += ".";
 
     for (; i < this->m_Digits.size(); ++i) {
-        result += '0' + this->m_Digits[i];
+        result += std::to_string(this->m_Digits[i]);
     }
 
     return (m_Negative ? "-" : "") + result;
 }
 
 std::strong_ordering operator<=>(const BigNum& a, const BigNum& b) {
-    using namespace bignum::literals;
+    using namespace bignum;
 
     if (a.m_Digits.empty() && b.m_Digits.empty()) return std::strong_ordering::equal;
 
     if (a.m_Negative != b.m_Negative) {
-        return a.m_Negative < b.m_Negative? std::strong_ordering::greater: std::strong_ordering::less;
+        return a.m_Negative < b.m_Negative? std::strong_ordering::greater : std::strong_ordering::less;
     }
 
     if (a.m_Exponent != b.m_Exponent) {
-        return ((a.m_Exponent > b.m_Exponent) ^ (a.m_Negative)? std::strong_ordering::greater: std::strong_ordering::less);
+        return ((a.m_Exponent > b.m_Exponent) ^ (a.m_Negative)? std::strong_ordering::greater : std::strong_ordering::less);
     }
 
     BigNum aCp{ a };
@@ -295,9 +305,4 @@ bool operator==(const BigNum& a, const BigNum& b) {
 bool operator!=(const BigNum& a, const BigNum& b) {
     return (a <=> b) != 0;
 }
-
-const char* ZeroDivisionException::what() const noexcept {
-    return "Error: division by zero";
-}
-
 }

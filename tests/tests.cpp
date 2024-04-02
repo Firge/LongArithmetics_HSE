@@ -1,7 +1,7 @@
 #include <BigNum/BigNum.hpp>
 #include <gtest/gtest.h>
 
-using namespace bignum::literals;
+using namespace bignum;
 
 TEST(Operations, Division)
 {
@@ -94,11 +94,11 @@ TEST(Comparison, NE) { EXPECT_NE(bignum::BigNum{ "-1.1" }, "1.1"_BN); }
 TEST(Comparison, EQ_Zero) { EXPECT_EQ(bignum::BigNum{ "-0" }, "0"_BN); }
 
 // conv
-TEST(General, ToString) { EXPECT_EQ((std::string)bignum::BigNum{ -345 }, "-345"); }
+TEST(General, ToString) { EXPECT_EQ((std::string) -345_BN, "-345"); }
 
 TEST(General, ToString_SmallExp) { EXPECT_EQ((std::string)bignum::BigNum{ "0.048701" }, "0.048701"); }
 
-TEST(General, ToString_Zero) { EXPECT_EQ((std::string)bignum::BigNum{ -0 }, "0"); }
+TEST(General, ToString_Zero) { EXPECT_EQ((std::string) -0_BN, "0"); }
 
 // services
 
@@ -108,22 +108,22 @@ TEST(General, GetPrecision)
     EXPECT_EQ(bignum::BigNum::getMinimalPrecision(), 100);
 }
 
-TEST(General, Cout) { EXPECT_NO_THROW(std::cout << bignum::BigNum{ -987456321 }); }
+TEST(General, Cout) { EXPECT_NO_THROW(std::cout << -987456321_BN); }
 
 TEST(General, DemoCase)
 {
     bignum::BigNum bignumFromString{ "-234.567" };
-    bignum::BigNum numFromBaseType1{ 13948 };
-    bignum::BigNum numFromBaseType2{ 13948.333 };
+    bignum::BigNum numFromBaseType1 = BigNum::fromInteger(13948);
+    bignum::BigNum numFromBaseType2 = BigNum::fromDouble(13948.333);
     12_BN - 3.85_BN;
     "94815.7902"_BN;
 
-    1 / bignumFromString;
+    1_BN / bignumFromString;
     bignumFromString.inverse();
 
     bignum::BigNum::setMinimalPrecision(100);
     auto a{ -1234.123_BN };
-    bignum::BigNum b{ 1234.01 };
+    bignum::BigNum b = BigNum::fromDouble(1234.01);
 
     (a * b);
     (a / b);

@@ -7,10 +7,10 @@
 namespace bignum
 {
 
-class ZeroDivisionException : public std::exception
+class ZeroDivisionException : public std::runtime_error
 {
-public:
-    [[nodiscard]] const char* what() const noexcept override;
+    public:
+        ZeroDivisionException() : std::runtime_error("ZeroDivisionError") {}
 };
 
 class BigNum
@@ -20,22 +20,25 @@ class BigNum
 public:
     BigNum();
 
-    template <typename Number,
-              typename std::enable_if<
-                  std::is_integral<Number>::value ||
-                  std::is_floating_point<Number>::value>::type* = nullptr>
-    BigNum(Number number) : BigNum{ std::to_string(number) }
-    {
-    }
+//    template <typename Number,
+//              typename std::enable_if<
+//                  std::is_integral<Number>::value ||
+//                  std::is_floating_point<Number>::value>::type* = nullptr>
+//    BigNum(Number number) : BigNum{ std::to_string(number) }
+//    {
+//    }
+
+    static BigNum fromInteger(int64_t val) { return BigNum{ std::to_string(val) }; }
+    static BigNum fromUnsignedInteger(uint64_t val) { return BigNum{ std::to_string(val) }; }
+    static BigNum fromDouble(long double val) { return BigNum{ std::to_string(val) }; }
 
     BigNum(const std::string&);
 
     static void setMinimalPrecision(uint64_t);
-    static int64_t getMinimalPrecision();
+    static uint64_t getMinimalPrecision();
 
     static BigNum pow(const BigNum&, const BigNum&);
 
-public:
     BigNum operator-() const;
 
     friend BigNum& operator-=(BigNum&, const BigNum&);
@@ -62,13 +65,11 @@ private:
     static void _commonExponent(BigNum&, BigNum&);
     static void _commonLength(BigNum&, BigNum&);
 
-    void _removeInsignificantZeroes();
     void _normalize();
 
     constexpr const DigitType& operator[](int32_t i) const;
     constexpr DigitType& operator[](int32_t i);
 
-private:
     static uint64_t s_Precision;
     static constexpr int64_t s_Base{ 10 };
 
@@ -91,11 +92,8 @@ bool operator==(const BigNum &, const BigNum &);
 bool operator!=(const BigNum &, const BigNum &);
 
 
-namespace literals
-{
-inline BigNum operator""_BN(unsigned long long num) { return BigNum{ num }; }
-inline BigNum operator""_BN(long double num) { return BigNum{ num }; }
+inline BigNum operator""_BN(unsigned long long num) { return BigNum::fromUnsignedInteger(num); }
+inline BigNum operator""_BN(long double num) { return BigNum::fromDouble(num); }
 inline BigNum operator"" _BN(const char* str, size_t len) { return BigNum{ str }; }
-}
 
 }
